@@ -1,7 +1,29 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Mail, Phone, MapPin } from 'lucide-react';
 
+const API_BASE = import.meta.env.VITE_BACKEND_URL || '';
+
 const Contact = () => {
+  const [form, setForm] = useState({ name:'', email:'', phone:'', message:'' });
+  const [status, setStatus] = useState('');
+
+  const submit = async (e) => {
+    e.preventDefault();
+    setStatus('');
+    try {
+      const res = await fetch(`${API_BASE}/api/messages`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      });
+      if (!res.ok) throw new Error('Failed to send');
+      setForm({ name:'', email:'', phone:'', message:'' });
+      setStatus('Thanks! We\'ll be in touch shortly.');
+    } catch (err) {
+      setStatus('Something went wrong. Please try again.');
+    }
+  };
+
   return (
     <section id="contact" className="w-full bg-[#0B1E3F] py-20 text-white">
       <div className="mx-auto max-w-7xl px-6">
@@ -18,28 +40,36 @@ const Contact = () => {
             </div>
           </div>
 
-          <form className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur">
+          <form onSubmit={submit} className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div>
                 <label className="mb-1 block text-sm text-white/80">Name</label>
                 <input
                   type="text"
+                  value={form.name}
+                  onChange={(e)=>setForm({...form,name:e.target.value})}
                   className="w-full rounded-md border border-white/20 bg-transparent px-3 py-2 text-white placeholder-white/40 outline-none focus:border-white"
                   placeholder="Jane Doe"
+                  required
                 />
               </div>
               <div>
                 <label className="mb-1 block text-sm text-white/80">Email</label>
                 <input
                   type="email"
+                  value={form.email}
+                  onChange={(e)=>setForm({...form,email:e.target.value})}
                   className="w-full rounded-md border border-white/20 bg-transparent px-3 py-2 text-white placeholder-white/40 outline-none focus:border-white"
                   placeholder="jane@example.com"
+                  required
                 />
               </div>
               <div>
                 <label className="mb-1 block text-sm text-white/80">Phone</label>
                 <input
                   type="tel"
+                  value={form.phone}
+                  onChange={(e)=>setForm({...form,phone:e.target.value})}
                   className="w-full rounded-md border border-white/20 bg-transparent px-3 py-2 text-white placeholder-white/40 outline-none focus:border-white"
                   placeholder="(555) 000-0000"
                 />
@@ -48,18 +78,16 @@ const Contact = () => {
                 <label className="mb-1 block text-sm text-white/80">Message</label>
                 <textarea
                   rows={4}
+                  value={form.message}
+                  onChange={(e)=>setForm({...form,message:e.target.value})}
                   className="w-full rounded-md border border-white/20 bg-transparent px-3 py-2 text-white placeholder-white/40 outline-none focus:border-white"
                   placeholder="Tell us about your project..."
+                  required
                 />
               </div>
             </div>
-            <button
-              type="button"
-              className="mt-4 w-full rounded-md bg-[#C7A76C] px-6 py-3 text-[#0B1E3F] transition hover:bg-[#b89656]"
-              onClick={() => alert('Thanks! We\'ll be in touch shortly.')}
-            >
-              Send Message
-            </button>
+            <button type="submit" className="mt-4 w-full rounded-md bg-[#C7A76C] px-6 py-3 text-[#0B1E3F] transition hover:bg-[#b89656]">Send Message</button>
+            {status && <p className="mt-3 text-sm text-white/90">{status}</p>}
           </form>
         </div>
 

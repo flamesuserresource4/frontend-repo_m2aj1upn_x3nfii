@@ -1,13 +1,24 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Hero from './components/Hero';
 import Services from './components/Services';
 import Gallery from './components/Gallery';
 import Contact from './components/Contact';
+import Admin from './components/Admin';
 
 const App = () => {
+  const [route, setRoute] = useState(window.location.hash || '#');
+  useEffect(() => {
+    const onHash = () => setRoute(window.location.hash || '#');
+    window.addEventListener('hashchange', onHash);
+    return () => window.removeEventListener('hashchange', onHash);
+  }, []);
+
+  if (route.startsWith('#/admin')) {
+    return <Admin />;
+  }
+
   return (
     <div className="min-h-screen bg-white text-[#0B1E3F]">
-      {/* Top navigation */}
       <header className="sticky top-0 z-50 w-full border-b border-[#0B1E3F]/10 bg-white/80 backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
           <a href="#home" className="flex items-center gap-3">
@@ -23,6 +34,7 @@ const App = () => {
             <a href="#services" className="hover:text-[#C7A76C]">Services</a>
             <a href="#gallery" className="hover:text-[#C7A76C]">Gallery</a>
             <a href="#contact" className="hover:text-[#C7A76C]">Contact</a>
+            <a href="#/admin" className="hover:text-[#C7A76C]">Admin</a>
           </nav>
           <a
             href="#contact"
